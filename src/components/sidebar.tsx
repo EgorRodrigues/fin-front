@@ -6,7 +6,9 @@ import {
   BarChart3,
   BriefcaseBusiness,
   CreditCard,
+  HandCoins,
   LayoutDashboard,
+  ReceiptText,
   Settings,
   Sparkles,
 } from "lucide-react";
@@ -16,6 +18,8 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Visão geral", href: "/", icon: LayoutDashboard },
   { label: "Contas", href: "/contas", icon: CreditCard },
+  { label: "Despesas", href: "/despesas", icon: ReceiptText },
+  { label: "Outras receitas", href: "/outras-receitas", icon: HandCoins },
   { label: "Investimentos", href: "/investimentos", icon: BriefcaseBusiness },
   { label: "Relatórios", href: "/relatorios", icon: BarChart3 },
   { label: "Configurações", href: "/configuracoes", icon: Settings },
