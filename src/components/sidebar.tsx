@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -78,6 +79,7 @@ export function Sidebar() {
                 <Sparkles className="h-4 w-4" />
               </div>
             </div>
+            <ThemeToggle />
           </div>
         </div>
       </div>
