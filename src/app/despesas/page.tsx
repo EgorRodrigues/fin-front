@@ -34,6 +34,7 @@ export default function DespesasPage() {
       metrics={metrics}
       transactions={transactions}
       summary={summary}
+      storageKey="financy:despesas"
     />
   );
 }

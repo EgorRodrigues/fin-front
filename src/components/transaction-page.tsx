@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import {
   ArrowUpRight,
   CalendarDays,
-  CircleDollarSign,
   CreditCard,
   type LucideIcon,
-  TrendingDown,
-  TrendingUp,
   X,
 } from "lucide-react";
 
@@ -41,6 +38,7 @@ interface TransactionPageProps {
   metrics: Metric[];
   transactions: TransactionItem[];
   summary: SummaryItem[];
+  storageKey: string;
 }
 
 const accentMap = {
@@ -80,11 +78,35 @@ export function TransactionPage({
   metrics,
   transactions,
   summary,
+  storageKey,
 }: TransactionPageProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState(initialForm);
+  const [persistedTransactions, setPersistedTransactions] = useState<TransactionItem[]>(() => {
+    if (typeof window === "undefined") {
+      return transactions;
+    }
+
+    const saved = window.localStorage.getItem(storageKey);
+    if (!saved) {
+      return transactions;
+    }
+
+    try {
+      const parsed = JSON.parse(saved) as TransactionItem[];
+      return Array.isArray(parsed) && parsed.length > 0 ? parsed : transactions;
+    } catch {
+      return transactions;
+    }
+  });
 
   const currentAccent = accentMap[accent];
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(storageKey, JSON.stringify(persistedTransactions));
+    }
+  }, [persistedTransactions, storageKey]);
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -99,7 +121,37 @@ export function TransactionPage({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Nova transação cadastrada:", formData);
+
+    const newTransaction: TransactionItem = {
+      name: formData.name,
+      category: formData.category,
+      amount: `${formData.account === "" ? "" : formData.account + " • "}${formData.amount ? Number(formData.amount) >= 0 ? "+R$ " : "-R$ " : ""}`,
+      date: formData.date,
+      status: "Registrado",
+    };
+
+    const normalizedAmount = Number(formData.amount || 0);
+    const amountLabel =
+      accent === "rose"
+        ? `-R$ ${Math.abs(normalizedAmount).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`
+        : `+R$ ${Math.abs(normalizedAmount).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`;
+
+    const transactionToSave: TransactionItem = {
+      name: formData.name,
+      category: `${formData.category} • ${formData.account}`,
+      amount: amountLabel,
+      date: formData.date,
+      status: "Registrado",
+    };
+
+    setPersistedTransactions((previous) => [transactionToSave, ...previous]);
+    console.log("Nova transação cadastrada:", transactionToSave);
     setFormData(initialForm);
     setIsOpen(false);
   };
@@ -147,14 +199,14 @@ export function TransactionPage({
                 <h2 className="text-xl font-semibold text-white">Últimas transações</h2>
               </div>
               <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs text-slate-300">
-                {transactions.length} itens
+                {persistedTransactions.length} itens
               </span>
             </div>
 
             <div className="space-y-3">
-              {transactions.map((transaction) => (
+              {persistedTransactions.map((transaction) => (
                 <div
-                  key={`${transaction.name}-${transaction.date}`}
+                  key={`${transaction.name}-${transaction.date}-${transaction.amount}`}
                   className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/40 p-4"
                 >
                   <div>

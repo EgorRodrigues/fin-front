@@ -34,6 +34,7 @@ export default function OutrasReceitasPage() {
       metrics={metrics}
       transactions={transactions}
       summary={summary}
+      storageKey="financy:outras-receitas"
     />
   );
 }
