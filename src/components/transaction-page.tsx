@@ -22,6 +22,7 @@ interface TransactionItem {
   amount: string;
   date: string;
   status: string;
+  account?: string;
 }
 
 interface SummaryItem {
@@ -81,6 +82,10 @@ export function TransactionPage({
   storageKey,
 }: TransactionPageProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<{
+    transaction: TransactionItem;
+    index: number;
+  } | null>(null);
   const [formData, setFormData] = useState(initialForm);
   const [persistedTransactions, setPersistedTransactions] = useState<TransactionItem[]>(() => {
     if (typeof window === "undefined") {
@@ -119,6 +124,18 @@ export function TransactionPage({
     }));
   };
 
+  const handleDeleteTransaction = (index: number) => {
+    setPersistedTransactions((previous) => previous.filter((_, currentIndex) => currentIndex !== index));
+
+    setSelectedTransaction((current) => {
+      if (!current || current.index !== index) {
+        return current;
+      }
+
+      return null;
+    });
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -128,6 +145,7 @@ export function TransactionPage({
       amount: `${formData.account === "" ? "" : formData.account + " • "}${formData.amount ? Number(formData.amount) >= 0 ? "+R$ " : "-R$ " : ""}`,
       date: formData.date,
       status: "Registrado",
+      account: formData.account,
     };
 
     const normalizedAmount = Number(formData.amount || 0);
@@ -144,10 +162,11 @@ export function TransactionPage({
 
     const transactionToSave: TransactionItem = {
       name: formData.name,
-      category: `${formData.category} • ${formData.account}`,
+      category: formData.category,
       amount: amountLabel,
       date: formData.date,
       status: "Registrado",
+      account: formData.account,
     };
 
     setPersistedTransactions((previous) => [transactionToSave, ...previous]);
@@ -204,31 +223,50 @@ export function TransactionPage({
             </div>
 
             <div className="space-y-3">
-              {persistedTransactions.map((transaction) => (
+              {persistedTransactions.map((transaction, index) => (
                 <div
-                  key={`${transaction.name}-${transaction.date}-${transaction.amount}`}
-                  className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/40 p-4"
+                  key={`${transaction.name}-${transaction.date}-${transaction.amount}-${index}`}
+                  className="flex items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-950/40 p-4"
                 >
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-base font-medium text-white">{transaction.name}</p>
                     <p className="text-sm text-slate-400">{transaction.category}</p>
                   </div>
 
-                  <div className="text-right">
-                    <p
-                      className={`text-base font-semibold ${
-                        accent === "cyan"
-                          ? "text-cyan-200"
-                          : accent === "rose"
-                            ? "text-rose-200"
-                            : "text-emerald-200"
-                      }`}
-                    >
-                      {transaction.amount}
-                    </p>
-                    <span className="mt-1 inline-flex rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-300">
-                      {transaction.date}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p
+                        className={`text-base font-semibold ${
+                          accent === "cyan"
+                            ? "text-cyan-200"
+                            : accent === "rose"
+                              ? "text-rose-200"
+                              : "text-emerald-200"
+                        }`}
+                      >
+                        {transaction.amount}
+                      </p>
+                      <span className="mt-1 inline-flex rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-300">
+                        {transaction.date}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTransaction({ transaction, index })}
+                        className="rounded-full border border-slate-700 px-2.5 py-1.5 text-[11px] font-medium text-slate-200 transition hover:border-slate-500 hover:text-white"
+                      >
+                        Visualizar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTransaction(index)}
+                        className="rounded-full border border-rose-500/40 bg-rose-500/10 px-2.5 py-1.5 text-[11px] font-medium text-rose-200 transition hover:bg-rose-500/20"
+                      >
+                        Excluir
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -258,6 +296,88 @@ export function TransactionPage({
           </div>
         </section>
       </div>
+
+      {selectedTransaction && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"
+          onClick={() => setSelectedTransaction(null)}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">Detalhes</p>
+                <h2 className="mt-2 text-2xl font-semibold text-white">{selectedTransaction.transaction.name}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedTransaction(null)}
+                className="rounded-full border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
+                aria-label="Fechar detalhes"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                <p className="text-sm text-slate-400">Valor</p>
+                <p className={`mt-2 text-2xl font-semibold ${
+                  accent === "cyan"
+                    ? "text-cyan-200"
+                    : accent === "rose"
+                      ? "text-rose-200"
+                      : "text-emerald-200"
+                }`}>
+                  {selectedTransaction.transaction.amount}
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="text-sm text-slate-400">Categoria</p>
+                  <p className="mt-2 text-base font-medium text-white">{selectedTransaction.transaction.category}</p>
+                </div>
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="text-sm text-slate-400">Conta</p>
+                  <p className="mt-2 text-base font-medium text-white">
+                    {selectedTransaction.transaction.account || "Não informada"}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="text-sm text-slate-400">Data</p>
+                  <p className="mt-2 text-base font-medium text-white">{selectedTransaction.transaction.date}</p>
+                </div>
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="text-sm text-slate-400">Status</p>
+                  <span className="mt-2 inline-flex rounded-full bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200">
+                    {selectedTransaction.transaction.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => handleDeleteTransaction(selectedTransaction.index)}
+                className="rounded-full border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-200 transition hover:bg-rose-500/20"
+              >
+                Excluir transação
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedTransaction(null)}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition ${currentAccent.button}`}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isOpen && (
         <div
