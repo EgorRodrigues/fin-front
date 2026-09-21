@@ -25,7 +25,7 @@ interface TransactionModulePageProps {
   eyebrow: string;
   title: string;
   buttonLabel: string;
-  accent: "cyan" | "rose" | "emerald";
+  accent?: "cyan" | "rose" | "emerald";
   storageKey: string;
 }
 
@@ -39,6 +39,7 @@ export function TransactionModulePage({
 }: TransactionModulePageProps) {
   const records = getTransactionsByModule(module);
   const moduleConfig = transactionModuleConfig[module];
+  const resolvedAccent = accent ?? moduleConfig.accent;
   const isExpenseModule = moduleConfig.isExpense;
 
   const total = records.reduce((sum, transaction) => sum + transaction.amount, 0);
@@ -86,7 +87,12 @@ export function TransactionModulePage({
     .map(([category, value]) => ({
       label: category,
       value: total > 0 ? Math.min(100, Math.max(10, Math.round((value / total) * 100 || 10))) : 0,
-      color: moduleConfig.accent === "rose" ? "bg-rose-400" : moduleConfig.accent === "emerald" ? "bg-emerald-400" : "bg-cyan-400",
+      color:
+        resolvedAccent === "rose"
+          ? "bg-rose-400"
+          : resolvedAccent === "emerald"
+            ? "bg-emerald-400"
+            : "bg-cyan-400",
     }));
 
   const transactions = records.map((transaction) => ({
@@ -103,7 +109,7 @@ export function TransactionModulePage({
       eyebrow={eyebrow}
       title={title}
       buttonLabel={buttonLabel}
-      accent={moduleConfig.accent}
+      accent={resolvedAccent}
       metrics={metrics}
       transactions={transactions}
       summary={summary}

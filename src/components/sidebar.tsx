@@ -19,9 +19,9 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Visão geral", href: "/", icon: LayoutDashboard },
   { label: "Contas", href: "/contas", icon: CreditCard },
-  { label: "Contas a pagar", href: "/despesas", icon: ReceiptText },
+  { label: "Contas a pagar", href: "/contas-a-pagar", icon: ReceiptText },
   { label: "Contas pagas", href: "/contas-pagas", icon: ReceiptText },
-  { label: "Contas a receber", href: "/outras-receitas", icon: HandCoins },
+  { label: "Contas a receber", href: "/contas-a-receber", icon: HandCoins },
   { label: "Contas recebidas", href: "/contas-recebidas", icon: HandCoins },
   { label: "Investimentos", href: "/investimentos", icon: BriefcaseBusiness },
   { label: "Relatórios", href: "/relatorios", icon: BarChart3 },
