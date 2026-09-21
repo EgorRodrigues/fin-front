@@ -87,25 +87,30 @@ export function TransactionPage({
     index: number;
   } | null>(null);
   const [formData, setFormData] = useState(initialForm);
-  const [persistedTransactions, setPersistedTransactions] = useState<TransactionItem[]>(() => {
+  const [persistedTransactions, setPersistedTransactions] = useState<TransactionItem[]>(transactions);
+
+  const currentAccent = accentMap[accent];
+
+  useEffect(() => {
     if (typeof window === "undefined") {
-      return transactions;
+      return;
     }
 
     const saved = window.localStorage.getItem(storageKey);
     if (!saved) {
-      return transactions;
+      setPersistedTransactions(transactions);
+      return;
     }
 
     try {
       const parsed = JSON.parse(saved) as TransactionItem[];
-      return Array.isArray(parsed) && parsed.length > 0 ? parsed : transactions;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setPersistedTransactions(parsed);
+      }
     } catch {
-      return transactions;
+      setPersistedTransactions(transactions);
     }
-  });
-
-  const currentAccent = accentMap[accent];
+  }, [storageKey, transactions]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

@@ -18,21 +18,6 @@ export const metadata: Metadata = {
   description: "Dashboard pessoal de finanças com indicadores, fluxo de caixa e organização de contas.",
 };
 
-const themeScript = `
-  (function() {
-    try {
-      const storedTheme = localStorage.getItem('theme');
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = storedTheme ?? (systemPrefersDark ? 'dark' : 'light');
-      document.documentElement.dataset.theme = theme;
-      document.documentElement.style.colorScheme = theme;
-    } catch (error) {
-      document.documentElement.dataset.theme = 'dark';
-      document.documentElement.style.colorScheme = 'dark';
-    }
-  })();
-`;
-
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -40,9 +25,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <AppShell>{children}</AppShell>
       </body>
