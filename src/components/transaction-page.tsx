@@ -122,6 +122,32 @@ const buildSummaryFromTransactions = (items: TransactionItem[]) => {
     }));
 };
 
+const getDueStatus = (date: string) => {
+  const today = new Date();
+  const dueDate = new Date(`${date}T00:00:00`);
+  const diffInMilliseconds = dueDate.getTime() - today.getTime();
+  const diffInDays = Math.ceil(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+  if (diffInDays < 0) {
+    return {
+      label: `Em atraso há ${Math.abs(diffInDays)} dia${Math.abs(diffInDays) === 1 ? "" : "s"}`,
+      tone: "bg-rose-500/15 text-rose-200 ring-1 ring-rose-400/30",
+    };
+  }
+
+  if (diffInDays <= 3) {
+    return {
+      label: diffInDays === 0 ? "Vence hoje" : `Vence em ${diffInDays} dia${diffInDays === 1 ? "" : "s"}`,
+      tone: "bg-amber-500/15 text-amber-200 ring-1 ring-amber-400/30",
+    };
+  }
+
+  return {
+    label: `Vence em ${diffInDays} dias`,
+    tone: "bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-400/30",
+  };
+};
+
 export function TransactionPage({
   module,
   eyebrow,
@@ -223,6 +249,11 @@ export function TransactionPage({
   });
 
   const summaryData = filteredTransactions.length > 0 ? buildSummaryFromTransactions(filteredTransactions) : summary;
+  const overdueCount = filteredTransactions.filter((transaction) => getDueStatus(transaction.date).label.startsWith("Em atraso")).length;
+  const dueSoonCount = filteredTransactions.filter((transaction) => {
+    const status = getDueStatus(transaction.date);
+    return status.label.includes("Vence") || status.label === "Vence hoje";
+  }).length;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -491,9 +522,14 @@ export function TransactionPage({
                       >
                         {transaction.amount}
                       </p>
-                      <span className="mt-1 inline-flex rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-300">
-                        {transaction.date}
-                      </span>
+                      <div className="mt-1 flex flex-col items-end gap-1.5">
+                        <span className="inline-flex rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-300">
+                          {transaction.date}
+                        </span>
+                        <span className={`inline-flex rounded-full px-2 py-1 text-[10px] font-medium ${getDueStatus(transaction.date).tone}`}>
+                          {getDueStatus(transaction.date).label}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -521,6 +557,17 @@ export function TransactionPage({
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
             <p className="text-sm text-slate-400">Resumo</p>
             <h2 className="mt-1 text-xl font-semibold text-white">Distribuição</h2>
+
+            <div className="mt-4 grid gap-3">
+              <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-3">
+                <p className="text-xs uppercase tracking-[0.18em] text-amber-200">Próximo vencimento</p>
+                <p className="mt-2 text-xl font-semibold text-white">{dueSoonCount}</p>
+              </div>
+              <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-3">
+                <p className="text-xs uppercase tracking-[0.18em] text-rose-200">Em atraso</p>
+                <p className="mt-2 text-xl font-semibold text-white">{overdueCount}</p>
+              </div>
+            </div>
 
             <div className="mt-6 space-y-5">
               {summaryData.map((item) => (
