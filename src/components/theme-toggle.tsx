@@ -8,19 +8,25 @@ import { cn } from "@/lib/utils";
 type Theme = "light" | "dark";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") {
+      return "dark";
+    }
+
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light" || savedTheme === "dark") {
+      return savedTheme;
+    }
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const preferredTheme = savedTheme ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-
-    document.documentElement.dataset.theme = preferredTheme;
-    setTheme(preferredTheme as Theme);
-  }, []);
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const applyTheme = (nextTheme: Theme) => {
-    document.documentElement.dataset.theme = nextTheme;
-    localStorage.setItem("theme", nextTheme);
     setTheme(nextTheme);
   };
 

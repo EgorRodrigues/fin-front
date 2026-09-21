@@ -87,30 +87,25 @@ export function TransactionPage({
     index: number;
   } | null>(null);
   const [formData, setFormData] = useState(initialForm);
-  const [persistedTransactions, setPersistedTransactions] = useState<TransactionItem[]>(transactions);
-
-  const currentAccent = accentMap[accent];
-
-  useEffect(() => {
+  const [persistedTransactions, setPersistedTransactions] = useState<TransactionItem[]>(() => {
     if (typeof window === "undefined") {
-      return;
+      return transactions;
     }
 
     const saved = window.localStorage.getItem(storageKey);
     if (!saved) {
-      setPersistedTransactions(transactions);
-      return;
+      return transactions;
     }
 
     try {
       const parsed = JSON.parse(saved) as TransactionItem[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setPersistedTransactions(parsed);
-      }
+      return Array.isArray(parsed) ? parsed : transactions;
     } catch {
-      setPersistedTransactions(transactions);
+      return transactions;
     }
-  }, [storageKey, transactions]);
+  });
+
+  const currentAccent = accentMap[accent];
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -143,15 +138,6 @@ export function TransactionPage({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    const newTransaction: TransactionItem = {
-      name: formData.name,
-      category: formData.category,
-      amount: `${formData.account === "" ? "" : formData.account + " • "}${formData.amount ? Number(formData.amount) >= 0 ? "+R$ " : "-R$ " : ""}`,
-      date: formData.date,
-      status: "Registrado",
-      account: formData.account,
-    };
 
     const normalizedAmount = Number(formData.amount || 0);
     const amountLabel =
