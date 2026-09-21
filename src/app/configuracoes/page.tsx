@@ -7,9 +7,9 @@ const settings = [
 ];
 
 const team = [
-  { name: "Você", role: "Gestor da conta", access: "Total" },
-  { name: "Parceiro(a)", role: "Visualização compartilhada", access: "Leitura" },
-  { name: "Consultor", role: "Suporte financeiro", access: "Limitado" },
+  { name: "Você", role: "Responsável pelo controle", access: "Total" },
+  { name: "Parceiro(a)", role: "Acesso de visão", access: "Leitura" },
+  { name: "Família", role: "Acompanhamento do orçamento", access: "Limitado" },
 ];
 
 export default function ConfiguracoesPage() {
@@ -39,7 +39,7 @@ export default function ConfiguracoesPage() {
           <div className="mb-5 flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Acesso</p>
-              <h2 className="text-xl font-semibold text-white">Equipe com permissões</h2>
+              <h2 className="text-xl font-semibold text-white">Pessoas com permissão</h2>
             </div>
             <div className="rounded-xl bg-slate-800 p-2 text-cyan-300">
               <ShieldEllipsis className="h-5 w-5" />
@@ -63,13 +63,13 @@ export default function ConfiguracoesPage() {
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
           <p className="text-sm text-slate-400">Status</p>
-          <h2 className="mt-1 text-xl font-semibold text-white">Sistema</h2>
+          <h2 className="mt-1 text-xl font-semibold text-white">Rotina financeira</h2>
 
           <div className="mt-5 space-y-4">
             {[
-              { label: "API financeira", value: "Online" },
-              { label: "Sincronização contábil", value: "Atualizada" },
-              { label: "Backup diário", value: "Concluído" },
+              { label: "Sincronização das contas", value: "Atualizada" },
+              { label: "Alertas de vencimento", value: "Ativos" },
+              { label: "Backup do orçamento", value: "Concluído" },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/40 p-3">
                 <span className="text-slate-300">{item.label}</span>

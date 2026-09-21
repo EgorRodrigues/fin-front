@@ -19,7 +19,7 @@ export default function InvestimentosPage() {
       <header className="flex flex-col gap-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-6 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-violet-300">Investimentos</p>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Portfólio estratégico e ganhos</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-white">Seu portfólio pessoal e rendimentos</h1>
         </div>
         <button className="inline-flex items-center justify-center rounded-full border border-violet-400/60 bg-violet-400/10 px-4 py-2 text-sm font-medium text-violet-200 transition hover:bg-violet-400/20">
           Novo aporte
@@ -51,7 +51,7 @@ export default function InvestimentosPage() {
           <div className="mb-5 flex items-center justify-between">
             <div>
               <p className="text-sm text-slate-400">Carteira</p>
-              <h2 className="text-xl font-semibold text-white">Distribuição por classe</h2>
+              <h2 className="text-xl font-semibold text-white">Distribuição do seu patrimônio</h2>
             </div>
           </div>
 
@@ -78,7 +78,7 @@ export default function InvestimentosPage() {
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
           <p className="text-sm text-slate-400">Movimentações</p>
-          <h2 className="mt-1 text-xl font-semibold text-white">Últimas operações</h2>
+          <h2 className="mt-1 text-xl font-semibold text-white">Últimas movimentações</h2>
 
           <div className="mt-5 space-y-3">
             {transactions.map((transaction) => (
