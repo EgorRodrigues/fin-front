@@ -19,7 +19,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-import type { Transaction } from "@/types/transaction";
+import { TransactionType, type Transaction } from "@/types/transaction";
 
 const cashFlowData = [
   { month: "Jan", receitas: 3200, despesas: 2100 },
@@ -61,10 +61,10 @@ function getStatusClasses(status: string) {
 
 export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
   const totalReceitas = transactions
-    .filter((transaction) => transaction.type === "receita")
+    .filter((transaction) => transaction.type === TransactionType.RECEITA)
     .reduce((sum, transaction) => sum + transaction.amount, 0);
   const totalDespesas = transactions
-    .filter((transaction) => transaction.type === "despesa")
+    .filter((transaction) => transaction.type === TransactionType.DESPESA)
     .reduce((sum, transaction) => sum + transaction.amount, 0);
   const saldoTotal = totalReceitas - totalDespesas;
 
@@ -75,7 +75,7 @@ export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`,
-    status: transaction.type === "receita" ? "Positivo" : "Atenção",
+    status: transaction.type === TransactionType.RECEITA ? "Positivo" : "Atenção",
   }));
 
   const metrics = [

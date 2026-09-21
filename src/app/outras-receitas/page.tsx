@@ -3,25 +3,47 @@
 import { CircleDollarSign, HandCoins, TrendingUp } from "lucide-react";
 
 import { TransactionPage } from "@/components/transaction-page";
+import { getTransactionsByModule } from "@/data/transactions";
+import { formatCurrency, TransactionModule } from "@/types/transaction";
+
+const receitas = getTransactionsByModule(TransactionModule.CONTAS_A_RECEBER);
+const recebidas = getTransactionsByModule(TransactionModule.CONTAS_RECEBIDAS);
 
 const metrics = [
-  { label: "Receita total", value: "R$ 780K", change: "+8,7% vs mês anterior", icon: HandCoins },
-  { label: "Recorrentes", value: "R$ 510K", change: "+5,2%", icon: TrendingUp },
-  { label: "Eventuais", value: "R$ 270K", change: "+12,4%", icon: CircleDollarSign },
+  {
+    label: "Receita total",
+    value: formatCurrency(receitas.reduce((sum, item) => sum + item.amount, 0)),
+    change: "+8,7% vs mês anterior",
+    icon: HandCoins,
+  },
+  {
+    label: "Recorrentes",
+    value: formatCurrency(recebidas.reduce((sum, item) => sum + item.amount, 0)),
+    change: "+5,2%",
+    icon: TrendingUp,
+  },
+  {
+    label: "Pendentes",
+    value: formatCurrency(receitas.filter((item) => item.status !== "recebido").reduce((sum, item) => sum + item.amount, 0)),
+    change: "+12,4%",
+    icon: CircleDollarSign,
+  },
 ];
 
-const transactions = [
-  { name: "Consultoria corporativa", category: "Serviços", amount: "+R$ 86K", date: "12/09", status: "Recebido" },
-  { name: "Venda de ativo", category: "Investimentos", amount: "+R$ 120K", date: "10/09", status: "Liquidado" },
-  { name: "Dividendos", category: "Renda", amount: "+R$ 34K", date: "09/09", status: "Confirmado" },
-  { name: "Ajuste de mensalidade", category: "Recorrentes", amount: "+R$ 22K", date: "08/09", status: "Programado" },
-];
+const transactions = receitas.map((transaction) => ({
+  name: transaction.description,
+  category: transaction.category,
+  amount: `+${formatCurrency(transaction.amount)}`,
+  date: transaction.date,
+  status: transaction.status,
+  account: transaction.account,
+}));
 
 const summary = [
   { label: "Serviços", value: 36, color: "bg-emerald-400" },
   { label: "Investimentos", value: 28, color: "bg-cyan-400" },
-  { label: "Renda", value: 21, color: "bg-violet-400" },
-  { label: "Recorrentes", value: 15, color: "bg-amber-400" },
+  { label: "Educação", value: 21, color: "bg-violet-400" },
+  { label: "Receitas fixas", value: 15, color: "bg-amber-400" },
 ];
 
 export default function OutrasReceitasPage() {

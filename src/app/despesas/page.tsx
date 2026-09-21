@@ -3,25 +3,47 @@
 import { Landmark, ReceiptText, TrendingDown } from "lucide-react";
 
 import { TransactionPage } from "@/components/transaction-page";
+import { getTransactionsByModule } from "@/data/transactions";
+import { formatCurrency, TransactionModule } from "@/types/transaction";
+
+const despesas = getTransactionsByModule(TransactionModule.CONTAS_A_PAGAR);
+const pagas = getTransactionsByModule(TransactionModule.CONTAS_PAGAS);
 
 const metrics = [
-  { label: "Total de despesas", value: "R$ 640K", change: "+4,2% vs mês anterior", icon: ReceiptText },
-  { label: "Fixas", value: "R$ 320K", change: "+1,8%", icon: Landmark },
-  { label: "Variáveis", value: "R$ 280K", change: "-2,1%", icon: TrendingDown },
+  {
+    label: "Total de despesas",
+    value: formatCurrency(despesas.reduce((sum, item) => sum + item.amount, 0)),
+    change: "+4,2% vs mês anterior",
+    icon: ReceiptText,
+  },
+  {
+    label: "Fixas",
+    value: formatCurrency(pagas.reduce((sum, item) => sum + item.amount, 0)),
+    change: "+1,8%",
+    icon: Landmark,
+  },
+  {
+    label: "Pendentes",
+    value: formatCurrency(despesas.filter((item) => item.status !== "pago").reduce((sum, item) => sum + item.amount, 0)),
+    change: "-2,1%",
+    icon: TrendingDown,
+  },
 ];
 
-const transactions = [
-  { name: "Aluguel da sede", category: "Operações", amount: "-R$ 42K", date: "12/09", status: "Pago" },
-  { name: "Folha de pagamento", category: "Pessoal", amount: "-R$ 86K", date: "10/09", status: "Em execução" },
-  { name: "Marketing digital", category: "Vendas", amount: "-R$ 18K", date: "09/09", status: "Aprovado" },
-  { name: "Serviços de TI", category: "Tecnologia", amount: "-R$ 24K", date: "07/09", status: "Pago" },
-];
+const transactions = despesas.map((transaction) => ({
+  name: transaction.description,
+  category: transaction.category,
+  amount: `-${formatCurrency(transaction.amount)}`,
+  date: transaction.date,
+  status: transaction.status,
+  account: transaction.account,
+}));
 
 const summary = [
-  { label: "Operações", value: 38, color: "bg-rose-400" },
-  { label: "Pessoal", value: 29, color: "bg-orange-400" },
-  { label: "Marketing", value: 19, color: "bg-cyan-400" },
-  { label: "Tecnologia", value: 14, color: "bg-violet-400" },
+  { label: "Moradia", value: 38, color: "bg-rose-400" },
+  { label: "Alimentação", value: 29, color: "bg-orange-400" },
+  { label: "Contas", value: 19, color: "bg-cyan-400" },
+  { label: "Saúde", value: 14, color: "bg-violet-400" },
 ];
 
 export default function DespesasPage() {

@@ -1,4 +1,9 @@
-import type { Transaction } from "@/types/transaction";
+import {
+  TransactionModule,
+  TransactionStatus,
+  TransactionType,
+  type Transaction,
+} from "@/types/transaction";
 
 export const transactionsSeed: Transaction[] = [
   {
@@ -7,9 +12,9 @@ export const transactionsSeed: Transaction[] = [
     category: "Moradia",
     amount: 1800,
     date: "2026-09-05",
-    type: "despesa",
-    status: "pago",
-    module: "contas-pagas",
+    type: TransactionType.DESPESA,
+    status: TransactionStatus.PAGO,
+    module: TransactionModule.CONTAS_PAGAS,
     account: "Conta Corrente",
   },
   {
@@ -18,9 +23,9 @@ export const transactionsSeed: Transaction[] = [
     category: "Receita fixa",
     amount: 5200,
     date: "2026-09-01",
-    type: "receita",
-    status: "recebido",
-    module: "contas-recebidas",
+    type: TransactionType.RECEITA,
+    status: TransactionStatus.RECEBIDO,
+    module: TransactionModule.CONTAS_RECEBIDAS,
     account: "Carteira",
   },
   {
@@ -29,9 +34,9 @@ export const transactionsSeed: Transaction[] = [
     category: "Alimentação",
     amount: 640,
     date: "2026-09-12",
-    type: "despesa",
-    status: "pendente",
-    module: "contas-a-pagar",
+    type: TransactionType.DESPESA,
+    status: TransactionStatus.PENDENTE,
+    module: TransactionModule.CONTAS_A_PAGAR,
     account: "Cartão",
   },
   {
@@ -40,9 +45,9 @@ export const transactionsSeed: Transaction[] = [
     category: "Serviços",
     amount: 1350,
     date: "2026-09-18",
-    type: "receita",
-    status: "pendente",
-    module: "contas-a-receber",
+    type: TransactionType.RECEITA,
+    status: TransactionStatus.PENDENTE,
+    module: TransactionModule.CONTAS_A_RECEBER,
     account: "Conta Corrente",
   },
   {
@@ -51,9 +56,9 @@ export const transactionsSeed: Transaction[] = [
     category: "Contas",
     amount: 120,
     date: "2026-09-20",
-    type: "despesa",
-    status: "vencida",
-    module: "contas-a-pagar",
+    type: TransactionType.DESPESA,
+    status: TransactionStatus.VENCIDA,
+    module: TransactionModule.CONTAS_A_PAGAR,
     account: "Conta Corrente",
   },
   {
@@ -62,9 +67,65 @@ export const transactionsSeed: Transaction[] = [
     category: "Serviços",
     amount: 900,
     date: "2026-09-15",
-    type: "receita",
-    status: "atrasada",
-    module: "contas-a-receber",
+    type: TransactionType.RECEITA,
+    status: TransactionStatus.ATRASADA,
+    module: TransactionModule.CONTAS_A_RECEBER,
     account: "Pix",
   },
+  {
+    id: "txn-007",
+    description: "Academia",
+    category: "Saúde",
+    amount: 180,
+    date: "2026-09-08",
+    type: TransactionType.DESPESA,
+    status: TransactionStatus.PENDENTE,
+    module: TransactionModule.CONTAS_A_PAGAR,
+    account: "Cartão",
+  },
+  {
+    id: "txn-008",
+    description: "Venda de curso",
+    category: "Educação",
+    amount: 780,
+    date: "2026-09-21",
+    type: TransactionType.RECEITA,
+    status: TransactionStatus.RECEBIDO,
+    module: TransactionModule.CONTAS_RECEBIDAS,
+    account: "Pix",
+  },
+  {
+    id: "txn-009",
+    description: "Conta de luz",
+    category: "Utilidades",
+    amount: 240,
+    date: "2026-09-10",
+    type: TransactionType.DESPESA,
+    status: TransactionStatus.PAGO,
+    module: TransactionModule.CONTAS_PAGAS,
+    account: "Conta Corrente",
+  },
+  {
+    id: "txn-010",
+    description: "Projeto extra",
+    category: "Serviços",
+    amount: 1500,
+    date: "2026-09-16",
+    type: TransactionType.RECEITA,
+    status: TransactionStatus.PENDENTE,
+    module: TransactionModule.CONTAS_A_RECEBER,
+    account: "Conta Corrente",
+  },
 ];
+
+export const transactionsByModule = Object.values(TransactionModule).reduce(
+  (groups, module) => {
+    groups[module] = transactionsSeed.filter((transaction) => transaction.module === module);
+    return groups;
+  },
+  {} as Record<TransactionModule, Transaction[]>,
+);
+
+export function getTransactionsByModule(module: TransactionModule) {
+  return transactionsByModule[module] ?? [];
+}
