@@ -27,13 +27,13 @@ Alta
 
 | ID | Título | Prioridade | Estimativa | Dependência | Status |
 |---|---|---:|---:|---|---|
-| E1-01 | Definir o modelo de domínio da Transação | Alta | M | Nenhuma | Planejado |
-| E1-02 | Definir enums de tipo, status e módulo | Alta | S | E1-01 | Planejado |
-| E1-03 | Criar dados mockados de exemplo para validar o domínio | Alta | S | E1-01, E1-02 | Planejado |
-| E1-04 | Estruturar navegação principal do app por módulos | Alta | M | E1-01, E1-02, E1-03 | Planejado |
-| E1-05 | Ajustar a linguagem e a UX para contexto pessoal | Média | S | E1-04 | Planejado |
-| E1-06 | Criar páginas base dos módulos principais | Alta | M | E1-03, E1-04, E1-05 | Planejado |
-| E1-07 | Validar aceite do Epic 1 e preparar transição para o Epic 2 | Alta | S | E1-04, E1-05, E1-06 | Planejado |
+| E1-01 | Definir o modelo de domínio da Transação | Alta | M | Nenhuma | Concluído |
+| E1-02 | Definir enums de tipo, status e módulo | Alta | S | E1-01 | Concluído |
+| E1-03 | Criar dados mockados de exemplo para validar o domínio | Alta | S | E1-01, E1-02 | Concluído |
+| E1-04 | Estruturar navegação principal do app por módulos | Alta | M | E1-01, E1-02, E1-03 | Concluído |
+| E1-05 | Ajustar a linguagem e a UX para contexto pessoal | Média | S | E1-04 | Concluído |
+| E1-06 | Criar páginas base dos módulos principais | Alta | M | E1-03, E1-04, E1-05 | Concluído |
+| E1-07 | Validar aceite do Epic 1 e preparar transição para o Epic 2 | Alta | S | E1-04, E1-05, E1-06 | Concluído |
 
 ---
 
