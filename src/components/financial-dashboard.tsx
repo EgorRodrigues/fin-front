@@ -131,12 +131,12 @@ export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
               Finanças pessoais
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
-              Dashboard do mês
+              Visão geral do mês
             </h1>
           </div>
 
           <button className="inline-flex items-center justify-center rounded-full border border-cyan-400/60 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-200 transition hover:bg-cyan-400/20">
-            Relatório mensal
+            Ver relatório
             <ArrowUpRight className="ml-2 h-4 w-4" />
           </button>
         </header>
@@ -166,7 +166,7 @@ export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-400">Fluxo de caixa</p>
-                <h2 className="text-xl font-semibold text-white">Comparativo de receitas e despesas</h2>
+                <h2 className="text-xl font-semibold text-white">Receitas e despesas do mês</h2>
               </div>
               <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
                 +18,2% no semestre
@@ -206,7 +206,7 @@ export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
             <div className="mb-4">
               <p className="text-sm text-slate-400">Composição</p>
-              <h2 className="text-xl font-semibold text-white">Carteira por setor</h2>
+              <h2 className="text-xl font-semibold text-white">Distribuição da sua carteira</h2>
             </div>
 
             <div className="h-72">
@@ -232,8 +232,8 @@ export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
         <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-slate-400">Operações recentes</p>
-              <h2 className="text-xl font-semibold text-white">Movimentações do período</h2>
+              <p className="text-sm text-slate-400">Movimentações recentes</p>
+              <h2 className="text-xl font-semibold text-white">Últimas entradas e saídas</h2>
             </div>
             <span className="text-sm text-slate-300">Atualizado hoje</span>
           </div>

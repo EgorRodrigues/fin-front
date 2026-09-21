@@ -1,15 +1,15 @@
 import { Bell, ShieldCheck, ShieldEllipsis, Users } from "lucide-react";
 
 const settings = [
-  { label: "Permissões do time", value: "12 usuários ativos", icon: Users },
-  { label: "Segurança", value: "2FA habilitado", icon: ShieldCheck },
-  { label: "Notificações", value: "4 alertas configurados", icon: Bell },
+  { label: "Acesso ao app", value: "Perfil principal ativo", icon: Users },
+  { label: "Segurança", value: "Autenticação ativada", icon: ShieldCheck },
+  { label: "Lembretes", value: "4 alertas configurados", icon: Bell },
 ];
 
 const team = [
-  { name: "Marina Costa", role: "Diretora financeira", access: "Total" },
-  { name: "Thiago Lima", role: "Controller", access: "Gerencial" },
-  { name: "Amanda Reis", role: "Analista", access: "Leitura" },
+  { name: "Você", role: "Gestor da conta", access: "Total" },
+  { name: "Parceiro(a)", role: "Visualização compartilhada", access: "Leitura" },
+  { name: "Consultor", role: "Suporte financeiro", access: "Limitado" },
 ];
 
 export default function ConfiguracoesPage() {
@@ -17,7 +17,7 @@ export default function ConfiguracoesPage() {
     <div className="space-y-6">
       <header className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Configurações</p>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Ajustes de operação e segurança</h1>
+        <h1 className="mt-2 text-3xl font-semibold text-white">Ajustes da sua rotina financeira</h1>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

@@ -19,8 +19,8 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Visão geral", href: "/", icon: LayoutDashboard },
   { label: "Contas", href: "/contas", icon: CreditCard },
-  { label: "Despesas", href: "/despesas", icon: ReceiptText },
-  { label: "Outras receitas", href: "/outras-receitas", icon: HandCoins },
+  { label: "Contas a pagar", href: "/despesas", icon: ReceiptText },
+  { label: "Contas a receber", href: "/outras-receitas", icon: HandCoins },
   { label: "Investimentos", href: "/investimentos", icon: BriefcaseBusiness },
   { label: "Relatórios", href: "/relatorios", icon: BarChart3 },
   { label: "Configurações", href: "/configuracoes", icon: Settings },
@@ -38,9 +38,9 @@ export function Sidebar() {
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-cyan-300">
-              FinanceFlow
+              Finanças
             </p>
-            <h2 className="text-base font-semibold text-white">Gerencial</h2>
+            <h2 className="text-base font-semibold text-white">Pessoais</h2>
           </div>
         </div>
 
@@ -67,11 +67,11 @@ export function Sidebar() {
 
         <div className="border-t border-slate-800 p-4">
           <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Operações</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Fluxo</p>
             <div className="mt-3 flex items-center justify-between">
               <div>
-                <p className="text-lg font-semibold text-white">R$ 2,84M</p>
-                <p className="text-xs text-emerald-300">+12,4% nesta semana</p>
+                <p className="text-lg font-semibold text-white">R$ 2.840,00</p>
+                <p className="text-xs text-emerald-300">+12,4% neste mês</p>
               </div>
               <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-300">
                 <Sparkles className="h-4 w-4" />

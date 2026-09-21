@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FinanceFlow | Dashboard Institucional",
-  description: "Dashboard financeiro institucional com indicadores, gráficos e tabelas.",
+  title: "Finanças Pessoais | Dashboard",
+  description: "Dashboard pessoal de finanças com indicadores, fluxo de caixa e organização de contas.",
 };
 
 const themeScript = `
