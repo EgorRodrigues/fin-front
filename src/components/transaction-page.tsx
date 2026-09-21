@@ -9,6 +9,12 @@ import {
   X,
 } from "lucide-react";
 
+import {
+  TransactionModule,
+  getModuleStatusOptions,
+  transactionStatusLabels,
+} from "@/types/transaction";
+
 interface Metric {
   label: string;
   value: string;
@@ -33,6 +39,7 @@ interface SummaryItem {
 }
 
 interface TransactionPageProps {
+  module?: TransactionModule;
   eyebrow: string;
   title: string;
   buttonLabel: string;
@@ -70,6 +77,9 @@ const initialForm = {
   amount: "",
   date: new Date().toISOString().slice(0, 10),
   account: "",
+  type: "despesa",
+  status: "pendente",
+  notes: "",
 };
 
 const filterStatusOptions = [
@@ -113,6 +123,7 @@ const buildSummaryFromTransactions = (items: TransactionItem[]) => {
 };
 
 export function TransactionPage({
+  module,
   eyebrow,
   title,
   buttonLabel,
@@ -127,7 +138,14 @@ export function TransactionPage({
     transaction: TransactionItem;
     index: number;
   } | null>(null);
-  const [formData, setFormData] = useState(initialForm);
+  const [formData, setFormData] = useState(() => ({
+    ...initialForm,
+    type:
+      module === TransactionModule.CONTAS_A_RECEBER || module === TransactionModule.CONTAS_RECEBIDAS
+        ? "receita"
+        : "despesa",
+    status: "pendente",
+  }));
   const [filters, setFilters] = useState({
     period: "todos",
     category: "todos",
@@ -211,7 +229,7 @@ export function TransactionPage({
   }, [persistedTransactions, storageKey]);
 
   const handleChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = event.target;
 
@@ -237,30 +255,32 @@ export function TransactionPage({
     event.preventDefault();
 
     const normalizedAmount = Number(formData.amount || 0);
-    const amountLabel =
-      accent === "rose"
-        ? `-R$ ${Math.abs(normalizedAmount).toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`
-        : `+R$ ${Math.abs(normalizedAmount).toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`;
+    const isExpense = formData.type === "despesa";
+    const amountLabel = `${isExpense ? "-" : "+"}R$ ${Math.abs(normalizedAmount).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
 
     const transactionToSave: TransactionItem = {
       name: formData.name,
       category: formData.category,
       amount: amountLabel,
       date: formData.date,
-      status: "Registrado",
+      status: transactionStatusLabels[formData.status as keyof typeof transactionStatusLabels] ?? "Pendente",
       account: formData.account,
-      value: normalizedAmount,
+      value: normalizedAmount * (isExpense ? -1 : 1),
     };
 
     setPersistedTransactions((previous) => [transactionToSave, ...previous]);
     console.log("Nova transação cadastrada:", transactionToSave);
-    setFormData(initialForm);
+    setFormData({
+      ...initialForm,
+      type:
+        module === TransactionModule.CONTAS_A_RECEBER || module === TransactionModule.CONTAS_RECEBIDAS
+          ? "receita"
+          : "despesa",
+      status: "pendente",
+    });
     setIsOpen(false);
   };
 
@@ -597,6 +617,35 @@ export function TransactionPage({
                 </label>
 
                 <label className="space-y-2 text-sm text-slate-300">
+                  <span>Tipo</span>
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+                  >
+                    <option value="despesa">Despesa</option>
+                    <option value="receita">Receita</option>
+                  </select>
+                </label>
+
+                <label className="space-y-2 text-sm text-slate-300">
+                  <span>Status</span>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+                  >
+                    {(module ? getModuleStatusOptions(module) : ["pendente", "vencida", "atrasada", "pago"]).map((status) => (
+                      <option key={status} value={status}>
+                        {transactionStatusLabels[status as keyof typeof transactionStatusLabels]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="space-y-2 text-sm text-slate-300">
                   <span>Categoria</span>
                   <input
                     name="category"
@@ -654,6 +703,18 @@ export function TransactionPage({
                       <option value="Reserva">Reserva</option>
                     </select>
                   </div>
+                </label>
+
+                <label className="space-y-2 text-sm text-slate-300 sm:col-span-2">
+                  <span>Observações</span>
+                  <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleChange}
+                    rows={3}
+                    placeholder="Detalhes adicionais da transação"
+                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+                  />
                 </label>
               </div>
 

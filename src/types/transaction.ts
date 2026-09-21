@@ -102,3 +102,20 @@ export const formatCurrency = (value: number) =>
     style: "currency",
     currency: "BRL",
   }).format(value);
+
+export const getModuleStatusOptions = (module: TransactionModule) => {
+  const isExpenseModule = module === TransactionModule.CONTAS_A_PAGAR || module === TransactionModule.CONTAS_PAGAS;
+
+  return isExpenseModule
+    ? [
+        TransactionStatus.PENDENTE,
+        TransactionStatus.VENCIDA,
+        TransactionStatus.ATRASADA,
+        TransactionStatus.PAGO,
+      ]
+    : [
+        TransactionStatus.PENDENTE,
+        TransactionStatus.ATRASADA,
+        TransactionStatus.RECEBIDO,
+      ];
+};

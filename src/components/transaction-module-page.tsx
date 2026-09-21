@@ -106,6 +106,7 @@ export function TransactionModulePage({
 
   return (
     <TransactionPage
+      module={module}
       eyebrow={eyebrow}
       title={title}
       buttonLabel={buttonLabel}
