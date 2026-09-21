@@ -260,7 +260,7 @@ export function TransactionPage({
                       <button
                         type="button"
                         onClick={() => setSelectedTransaction({ transaction, index })}
-                        className="rounded-full border border-slate-700 px-2.5 py-1.5 text-[11px] font-medium text-slate-200 transition hover:border-slate-500 hover:text-white"
+                        className={`rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition ${currentAccent.button} shadow-sm`}
                       >
                         Visualizar
                       </button>
@@ -308,18 +308,18 @@ export function TransactionPage({
           onClick={() => setSelectedTransaction(null)}
         >
           <div
-            className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40"
+            className="transaction-viewer-modal w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">Detalhes</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">{selectedTransaction.transaction.name}</h2>
+                <p className="transaction-detail-eyebrow text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">Detalhes</p>
+                <h2 className="transaction-modal-title mt-2 text-2xl font-semibold text-white">{selectedTransaction.transaction.name}</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedTransaction(null)}
-                className="rounded-full border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
+                className="transaction-modal-close-btn rounded-full border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
                 aria-label="Fechar detalhes"
               >
                 <X className="h-4 w-4" />
@@ -327,37 +327,37 @@ export function TransactionPage({
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
-                <p className="text-sm text-slate-400">Valor</p>
-                <p className={`mt-2 text-2xl font-semibold ${
+              <div className="transaction-modal-surface rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                <p className="transaction-modal-muted text-sm text-slate-400">Valor</p>
+                <p className={`transaction-detail-value mt-2 text-2xl font-semibold ${
                   accent === "cyan"
-                    ? "text-cyan-200"
+                    ? "transaction-detail-value-cyan"
                     : accent === "rose"
-                      ? "text-rose-200"
-                      : "text-emerald-200"
+                      ? "transaction-detail-value-rose"
+                      : "transaction-detail-value-emerald"
                 }`}>
                   {selectedTransaction.transaction.amount}
                 </p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
-                  <p className="text-sm text-slate-400">Categoria</p>
-                  <p className="mt-2 text-base font-medium text-white">{selectedTransaction.transaction.category}</p>
+                <div className="transaction-modal-surface rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="transaction-modal-muted text-sm text-slate-400">Categoria</p>
+                  <p className="transaction-modal-title mt-2 text-base font-medium text-white">{selectedTransaction.transaction.category}</p>
                 </div>
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
-                  <p className="text-sm text-slate-400">Conta</p>
-                  <p className="mt-2 text-base font-medium text-white">
+                <div className="transaction-modal-surface rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="transaction-modal-muted text-sm text-slate-400">Conta</p>
+                  <p className="transaction-modal-title mt-2 text-base font-medium text-white">
                     {selectedTransaction.transaction.account || "Não informada"}
                   </p>
                 </div>
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
-                  <p className="text-sm text-slate-400">Data</p>
-                  <p className="mt-2 text-base font-medium text-white">{selectedTransaction.transaction.date}</p>
+                <div className="transaction-modal-surface rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="transaction-modal-muted text-sm text-slate-400">Data</p>
+                  <p className="transaction-modal-title mt-2 text-base font-medium text-white">{selectedTransaction.transaction.date}</p>
                 </div>
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
-                  <p className="text-sm text-slate-400">Status</p>
-                  <span className="mt-2 inline-flex rounded-full bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200">
+                <div className="transaction-modal-surface rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="transaction-modal-muted text-sm text-slate-400">Status</p>
+                  <span className="transaction-modal-status mt-2 inline-flex rounded-full bg-slate-800 px-2.5 py-1 text-xs font-medium text-slate-200">
                     {selectedTransaction.transaction.status}
                   </span>
                 </div>
@@ -368,7 +368,7 @@ export function TransactionPage({
               <button
                 type="button"
                 onClick={() => handleDeleteTransaction(selectedTransaction.index)}
-                className="rounded-full border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-200 transition hover:bg-rose-500/20"
+                className="transaction-danger-btn rounded-full border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-200 transition hover:bg-rose-500/20"
               >
                 Excluir transação
               </button>
