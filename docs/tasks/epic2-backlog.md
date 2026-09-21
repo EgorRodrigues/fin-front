@@ -31,11 +31,11 @@ Alta
 | E2-02 | Reaproveitar a base de componente de módulo para contas a pagar e receber | Alta | M | E2-01 | Concluído |
 | E2-03 | Implementar a tela de contas a pagar com dados e métricas | Alta | M | E2-02 | Concluído |
 | E2-04 | Implementar a tela de contas a receber com dados e métricas | Alta | M | E2-02 | Concluído |
-| E2-05 | Adicionar filtros por período, categoria, status e valor | Alta | M | E2-03, E2-04 | Planejado |
-| E2-06 | Criar fluxo de cadastro de transação para despesa e receita | Alta | M | E2-05 | Planejado |
-| E2-07 | Implementar edição e remoção de movimentações pendentes | Alta | M | E2-06 | Planejado |
-| E2-08 | Exibir indicadores de vencimento próximo e em atraso | Alta | M | E2-03, E2-04 | Planejado |
-| E2-09 | Validar critérios de aceite do Epic 2 e preparar transição para o Epic 3 | Alta | S | E2-03, E2-04, E2-05, E2-06, E2-07, E2-08 | Planejado |
+| E2-05 | Adicionar filtros por período, categoria, status e valor | Alta | M | E2-03, E2-04 | Concluído |
+| E2-06 | Criar fluxo de cadastro de transação para despesa e receita | Alta | M | E2-05 | Concluído |
+| E2-07 | Implementar edição e remoção de movimentações pendentes | Alta | M | E2-06 | Concluído |
+| E2-08 | Exibir indicadores de vencimento próximo e em atraso | Alta | M | E2-03, E2-04 | Concluído |
+| E2-09 | Validar critérios de aceite do Epic 2 e preparar transição para o Epic 3 | Alta | S | E2-03, E2-04, E2-05, E2-06, E2-07, E2-08 | Concluído |
 
 ---
 
@@ -258,6 +258,14 @@ Garantir que o app está estável para seguir para a fase de histórico de conta
 - o usuário consegue filtrar transações por período, categoria e status
 - a navegação entre módulo de pagar e receber é clara e consistente
 - os critérios do Epic 2 foram validados antes da transição
+
+**Validação final realizada**
+
+- Registro de movimentações pendentes validado no componente compartilhado de módulo em [src/components/transaction-page.tsx](src/components/transaction-page.tsx)
+- Filtros por período, categoria, status e valor validados no mesmo arquivo de fluxo de módulo
+- Alertas de vencimento próximo e atraso validados em [src/components/transaction-page.tsx](src/components/transaction-page.tsx)
+- Navegação de pagar/receber validada em [src/components/sidebar.tsx](src/components/sidebar.tsx)
+- Preparação para o Epic 3: a base de módulos e transações já está pronta para evoluir para o histórico de contas pagas e recebidas sem duplicar o domínio
 
 **Estimativa**: S
 
