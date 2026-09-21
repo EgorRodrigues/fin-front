@@ -1,5 +1,6 @@
 import { FinancialDashboard } from "@/components/financial-dashboard";
+import { transactionsSeed } from "@/data/transactions";
 
 export default function Home() {
-  return <FinancialDashboard />;
+  return <FinancialDashboard transactions={transactionsSeed} />;
 }

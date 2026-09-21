@@ -19,6 +19,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import type { Transaction } from "@/types/transaction";
+
 const cashFlowData = [
   { month: "Jan", receitas: 3200, despesas: 2100 },
   { month: "Fev", receitas: 3800, despesas: 2400 },
@@ -42,44 +44,9 @@ type MovementItem = {
   status: string;
 };
 
-const movementData: MovementItem[] = [
-  { setor: "Bancos", categoria: "Receita operacional", valor: "R$ 120.400", status: "Positivo" },
-  { setor: "Seguros", categoria: "Despesas administrativas", valor: "R$ 52.300", status: "Atenção" },
-  { setor: "Corretora", categoria: "Investimentos", valor: "R$ 84.700", status: "Positivo" },
-  { setor: "Capital", categoria: "Pagamento de juros", valor: "R$ 39.200", status: "Normal" },
-  { setor: "Private", categoria: "Cobrança de clientes", valor: "R$ 91.600", status: "Positivo" },
-];
-
-const metrics = [
-  {
-    label: "Saldo disponível",
-    value: "R$ 2,84M",
-    delta: "+12,4%",
-    icon: CircleDollarSign,
-    accent: "text-emerald-300",
-  },
-  {
-    label: "Receitas líquidas",
-    value: "R$ 1,61M",
-    delta: "+8,1%",
-    icon: TrendingUp,
-    accent: "text-cyan-300",
-  },
-  {
-    label: "Investimentos",
-    value: "R$ 4,12M",
-    delta: "+5,6%",
-    icon: BriefcaseBusiness,
-    accent: "text-violet-300",
-  },
-  {
-    label: "Fluxo do mês",
-    value: "R$ 680K",
-    delta: "+3,2%",
-    icon: BanknoteArrowUp,
-    accent: "text-amber-300",
-  },
-];
+interface FinancialDashboardProps {
+  transactions: Transaction[];
+}
 
 function getStatusClasses(status: string) {
   switch (status) {
@@ -92,7 +59,59 @@ function getStatusClasses(status: string) {
   }
 }
 
-export function FinancialDashboard() {
+export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
+  const totalReceitas = transactions
+    .filter((transaction) => transaction.type === "receita")
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const totalDespesas = transactions
+    .filter((transaction) => transaction.type === "despesa")
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const saldoTotal = totalReceitas - totalDespesas;
+
+  const movementData: MovementItem[] = transactions.map((transaction) => ({
+    setor: transaction.account ?? "Conta pessoal",
+    categoria: transaction.category,
+    valor: `R$ ${transaction.amount.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    status: transaction.type === "receita" ? "Positivo" : "Atenção",
+  }));
+
+  const metrics = [
+    {
+      label: "Saldo total",
+      value: `R$ ${saldoTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      delta: "+12,4%",
+      icon: CircleDollarSign,
+      accent: "text-emerald-300",
+    },
+    {
+      label: "Receitas",
+      value: `R$ ${totalReceitas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      delta: "+8,1%",
+      icon: TrendingUp,
+      accent: "text-cyan-300",
+    },
+    {
+      label: "Despesas",
+      value: `R$ ${totalDespesas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      delta: "+5,6%",
+      icon: BriefcaseBusiness,
+      accent: "text-violet-300",
+    },
+    {
+      label: "Fluxo do mês",
+      value: `R$ ${(totalReceitas - totalDespesas).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      delta: "+3,2%",
+      icon: BanknoteArrowUp,
+      accent: "text-amber-300",
+    },
+  ];
+
   const formatTooltipValue = (
     value: string | number | readonly (string | number)[] | undefined,
   ) => {
@@ -109,10 +128,10 @@ export function FinancialDashboard() {
         <header className="mb-8 flex flex-col gap-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-slate-950/40 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
-              FinanceFlow Group
+              Finanças pessoais
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
-              Dashboard institucional
+              Dashboard do mês
             </h1>
           </div>
 
