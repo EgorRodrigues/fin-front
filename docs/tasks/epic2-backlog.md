@@ -27,10 +27,10 @@ Alta
 
 | ID | Título | Prioridade | Estimativa | Dependência | Status |
 |---|---|---:|---:|---|---|
-| E2-01 | Definir a arquitetura de telas por módulo de pendência | Alta | M | E1-06 | Em andamento |
-| E2-02 | Reaproveitar a base de componente de módulo para contas a pagar e receber | Alta | M | E2-01 | Planejado |
-| E2-03 | Implementar a tela de contas a pagar com dados e métricas | Alta | M | E2-02 | Em andamento |
-| E2-04 | Implementar a tela de contas a receber com dados e métricas | Alta | M | E2-02 | Planejado |
+| E2-01 | Definir a arquitetura de telas por módulo de pendência | Alta | M | E1-06 | Concluído |
+| E2-02 | Reaproveitar a base de componente de módulo para contas a pagar e receber | Alta | M | E2-01 | Concluído |
+| E2-03 | Implementar a tela de contas a pagar com dados e métricas | Alta | M | E2-02 | Concluído |
+| E2-04 | Implementar a tela de contas a receber com dados e métricas | Alta | M | E2-02 | Concluído |
 | E2-05 | Adicionar filtros por período, categoria, status e valor | Alta | M | E2-03, E2-04 | Planejado |
 | E2-06 | Criar fluxo de cadastro de transação para despesa e receita | Alta | M | E2-05 | Planejado |
 | E2-07 | Implementar edição e remoção de movimentações pendentes | Alta | M | E2-06 | Planejado |

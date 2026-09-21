@@ -23,6 +23,7 @@ interface TransactionItem {
   date: string;
   status: string;
   account?: string;
+  value?: number;
 }
 
 interface SummaryItem {
@@ -71,6 +72,46 @@ const initialForm = {
   account: "",
 };
 
+const filterStatusOptions = [
+  "Todos",
+  "Pendente",
+  "Vencida",
+  "Atrasada",
+  "Pago",
+  "Recebido",
+  "Registrado",
+];
+
+const parseTransactionAmount = (amount: string) => {
+  if (!amount) {
+    return 0;
+  }
+
+  const normalized = amount.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".");
+  const numericValue = Number(normalized);
+
+  return Number.isFinite(numericValue) ? numericValue : 0;
+};
+
+const buildSummaryFromTransactions = (items: TransactionItem[]) => {
+  const total = items.reduce((sum, transaction) => sum + (transaction.value ?? parseTransactionAmount(transaction.amount)), 0);
+
+  return Object.entries(
+    items.reduce<Record<string, number>>((accumulator, transaction) => {
+      const amount = transaction.value ?? parseTransactionAmount(transaction.amount);
+      accumulator[transaction.category] = (accumulator[transaction.category] ?? 0) + amount;
+      return accumulator;
+    }, {}),
+  )
+    .sort(([, left], [, right]) => right - left)
+    .slice(0, 4)
+    .map(([label, value]) => ({
+      label,
+      value: total > 0 ? Math.min(100, Math.max(10, Math.round((value / total) * 100 || 10))) : 0,
+      color: "bg-cyan-400",
+    }));
+};
+
 export function TransactionPage({
   eyebrow,
   title,
@@ -87,6 +128,13 @@ export function TransactionPage({
     index: number;
   } | null>(null);
   const [formData, setFormData] = useState(initialForm);
+  const [filters, setFilters] = useState({
+    period: "todos",
+    category: "todos",
+    status: "todos",
+    min: "",
+    max: "",
+  });
   const [persistedTransactions, setPersistedTransactions] = useState<TransactionItem[]>(() => {
     if (typeof window === "undefined") {
       return transactions;
@@ -106,6 +154,55 @@ export function TransactionPage({
   });
 
   const currentAccent = accentMap[accent];
+
+  const categoryOptions = Array.from(
+    new Set([...persistedTransactions.map((transaction) => transaction.category), ...transactions.map((transaction) => transaction.category)]),
+  ).filter(Boolean);
+
+  const handleFilterChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
+
+    setFilters((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const filteredTransactions = persistedTransactions.filter((transaction) => {
+    const numericValue = transaction.value ?? parseTransactionAmount(transaction.amount);
+    const matchesCategory = filters.category === "todos" || transaction.category === filters.category;
+    const matchesStatus = filters.status === "todos" || transaction.status === filters.status;
+    const matchesMin = filters.min === "" || numericValue >= Number(filters.min);
+    const matchesMax = filters.max === "" || numericValue <= Number(filters.max);
+
+    if (!matchesCategory || !matchesStatus || !matchesMin || !matchesMax) {
+      return false;
+    }
+
+    if (filters.period === "todos") {
+      return true;
+    }
+
+    const currentDate = new Date();
+    const transactionDate = new Date(`${transaction.date}T00:00:00`);
+    const dayDifference = (transactionDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24);
+
+    switch (filters.period) {
+      case "mes_atual":
+        return (
+          transactionDate.getMonth() === currentDate.getMonth() &&
+          transactionDate.getFullYear() === currentDate.getFullYear()
+        );
+      case "30_dias":
+        return Math.abs(dayDifference) <= 30;
+      case "proximos_30":
+        return dayDifference >= 0 && dayDifference <= 30;
+      default:
+        return true;
+    }
+  });
+
+  const summaryData = filteredTransactions.length > 0 ? buildSummaryFromTransactions(filteredTransactions) : summary;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -158,6 +255,7 @@ export function TransactionPage({
       date: formData.date,
       status: "Registrado",
       account: formData.account,
+      value: normalizedAmount,
     };
 
     setPersistedTransactions((previous) => [transactionToSave, ...previous]);
@@ -201,6 +299,96 @@ export function TransactionPage({
           ))}
         </section>
 
+        <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+          <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm text-slate-400">Filtros</p>
+              <h2 className="text-xl font-semibold text-white">Refinar movimentações</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFilters({ period: "todos", category: "todos", status: "todos", min: "", max: "" })}
+              className="rounded-full border border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:border-slate-500"
+            >
+              Limpar filtros
+            </button>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <label className="space-y-2 text-sm text-slate-300">
+              <span>Período</span>
+              <select
+                name="period"
+                value={filters.period}
+                onChange={handleFilterChange}
+                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              >
+                <option value="todos">Todos</option>
+                <option value="mes_atual">Este mês</option>
+                <option value="30_dias">Últimos 30 dias</option>
+                <option value="proximos_30">Próximos 30 dias</option>
+              </select>
+            </label>
+
+            <label className="space-y-2 text-sm text-slate-300">
+              <span>Categoria</span>
+              <select
+                name="category"
+                value={filters.category}
+                onChange={handleFilterChange}
+                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              >
+                <option value="todos">Todas</option>
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2 text-sm text-slate-300">
+              <span>Status</span>
+              <select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              >
+                {filterStatusOptions.map((status) => (
+                  <option key={status} value={status === "Todos" ? "todos" : status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2 text-sm text-slate-300">
+              <span>Valor mínimo</span>
+              <input
+                name="min"
+                type="number"
+                value={filters.min}
+                onChange={handleFilterChange}
+                placeholder="0"
+                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              />
+            </label>
+
+            <label className="space-y-2 text-sm text-slate-300">
+              <span>Valor máximo</span>
+              <input
+                name="max"
+                type="number"
+                value={filters.max}
+                onChange={handleFilterChange}
+                placeholder="9999"
+                className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-cyan-400"
+              />
+            </label>
+          </div>
+        </section>
+
         <section className="grid gap-6 xl:grid-cols-[1.7fr_1fr]">
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
             <div className="mb-5 flex items-center justify-between">
@@ -209,12 +397,12 @@ export function TransactionPage({
                 <h2 className="text-xl font-semibold text-white">Últimas transações</h2>
               </div>
               <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs text-slate-300">
-                {persistedTransactions.length} itens
+                {filteredTransactions.length} itens
               </span>
             </div>
 
             <div className="space-y-3">
-              {persistedTransactions.map((transaction, index) => (
+              {filteredTransactions.map((transaction, index) => (
                 <div
                   key={`${transaction.name}-${transaction.date}-${transaction.amount}-${index}`}
                   className="flex items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-slate-950/40 p-4"
@@ -269,7 +457,7 @@ export function TransactionPage({
             <h2 className="mt-1 text-xl font-semibold text-white">Distribuição</h2>
 
             <div className="mt-6 space-y-5">
-              {summary.map((item) => (
+              {summaryData.map((item) => (
                 <div key={item.label}>
                   <div className="mb-2 flex items-center justify-between text-sm text-slate-300">
                     <span>{item.label}</span>
