@@ -38,6 +38,7 @@ const portfolioData = [
 ];
 
 type MovementItem = {
+  id: string;
   setor: string;
   categoria: string;
   valor: string;
@@ -69,6 +70,7 @@ export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
   const saldoTotal = totalReceitas - totalDespesas;
 
   const movementData: MovementItem[] = transactions.map((transaction) => ({
+    id: transaction.id,
     setor: transaction.account ?? "Conta pessoal",
     categoria: transaction.category,
     valor: `R$ ${transaction.amount.toLocaleString("pt-BR", {
@@ -250,7 +252,7 @@ export function FinancialDashboard({ transactions }: FinancialDashboardProps) {
               </thead>
               <tbody>
                 {movementData.map((row) => (
-                  <tr key={`${row.setor}-${row.categoria}`} className="border-b border-slate-800/80 text-slate-200">
+                  <tr key={row.id} className="border-b border-slate-800/80 text-slate-200">
                     <td className="px-4 py-3">{row.setor}</td>
                     <td className="px-4 py-3">{row.categoria}</td>
                     <td className="px-4 py-3">{row.valor}</td>

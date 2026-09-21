@@ -1,33 +1,58 @@
 "use client";
 
 import { MoonStar, SunMedium } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 import { cn } from "@/lib/utils";
 
 type Theme = "light" | "dark";
 
+const getStoredTheme = (): Theme => {
+  if (typeof window === "undefined") {
+    return "dark";
+  }
+
+  const savedTheme = window.localStorage.getItem("theme");
+  if (savedTheme === "light" || savedTheme === "dark") {
+    return savedTheme;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+};
+
+function subscribeToTheme(callback: () => void) {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const handleStorage = () => callback();
+  const handleMedia = () => callback();
+  const handleThemeChange = () => callback();
+
+  window.addEventListener("storage", handleStorage);
+  mediaQuery.addEventListener("change", handleMedia);
+  window.addEventListener("themechange", handleThemeChange);
+
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    mediaQuery.removeEventListener("change", handleMedia);
+    window.removeEventListener("themechange", handleThemeChange);
+  };
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") {
-      return "dark";
-    }
-
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "light" || savedTheme === "dark") {
-      return savedTheme;
-    }
-
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  });
+  const theme = useSyncExternalStore(subscribeToTheme, getStoredTheme, () => "dark");
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem("theme", theme);
+    window.localStorage.setItem("theme", theme);
   }, [theme]);
 
   const applyTheme = (nextTheme: Theme) => {
-    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+    window.localStorage.setItem("theme", nextTheme);
+    window.dispatchEvent(new CustomEvent("themechange", { detail: nextTheme }));
   };
 
   const isLight = theme === "light";
