@@ -138,6 +138,8 @@ export function TransactionPage({
     transaction: TransactionItem;
     index: number;
   } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState(() => ({
     ...initialForm,
     type:
@@ -251,6 +253,41 @@ export function TransactionPage({
     });
   };
 
+  const openCreateModal = () => {
+    setIsEditing(false);
+    setEditingIndex(null);
+    setFormData({
+      ...initialForm,
+      type:
+        module === TransactionModule.CONTAS_A_RECEBER || module === TransactionModule.CONTAS_RECEBIDAS
+          ? "receita"
+          : "despesa",
+      status: "pendente",
+    });
+    setIsOpen(true);
+  };
+
+  const openEditModal = (transaction: TransactionItem, index: number) => {
+    const normalizedValue = transaction.value ?? parseTransactionAmount(transaction.amount);
+    const nextType = normalizedValue < 0 ? "despesa" : "receita";
+    const statusKey = Object.entries(transactionStatusLabels).find(([, value]) => value === transaction.status)?.[0] ?? "pendente";
+
+    setIsEditing(true);
+    setEditingIndex(index);
+    setFormData({
+      name: transaction.name,
+      category: transaction.category,
+      amount: Math.abs(normalizedValue).toString(),
+      date: transaction.date,
+      account: transaction.account ?? "",
+      type: nextType,
+      status: statusKey,
+      notes: "",
+    });
+    setSelectedTransaction(null);
+    setIsOpen(true);
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -271,8 +308,15 @@ export function TransactionPage({
       value: normalizedAmount * (isExpense ? -1 : 1),
     };
 
-    setPersistedTransactions((previous) => [transactionToSave, ...previous]);
-    console.log("Nova transação cadastrada:", transactionToSave);
+    if (isEditing && editingIndex !== null) {
+      setPersistedTransactions((previous) =>
+        previous.map((transaction, index) => (index === editingIndex ? transactionToSave : transaction)),
+      );
+    } else {
+      setPersistedTransactions((previous) => [transactionToSave, ...previous]);
+      console.log("Nova transação cadastrada:", transactionToSave);
+    }
+
     setFormData({
       ...initialForm,
       type:
@@ -281,6 +325,8 @@ export function TransactionPage({
           : "despesa",
       status: "pendente",
     });
+    setIsEditing(false);
+    setEditingIndex(null);
     setIsOpen(false);
   };
 
@@ -296,7 +342,7 @@ export function TransactionPage({
           </div>
           <button
             type="button"
-            onClick={() => setIsOpen(true)}
+            onClick={openCreateModal}
             className={`inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition ${currentAccent.button}`}
           >
             {buttonLabel}
@@ -561,6 +607,13 @@ export function TransactionPage({
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
+                onClick={() => openEditModal(selectedTransaction.transaction, selectedTransaction.index)}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition ${currentAccent.button}`}
+              >
+                Editar transação
+              </button>
+              <button
+                type="button"
                 onClick={() => handleDeleteTransaction(selectedTransaction.index)}
                 className="transaction-danger-btn rounded-full border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-200 transition hover:bg-rose-500/20"
               >
@@ -569,7 +622,7 @@ export function TransactionPage({
               <button
                 type="button"
                 onClick={() => setSelectedTransaction(null)}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition ${currentAccent.button}`}
+                className="rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-500 hover:text-white"
               >
                 Fechar
               </button>
@@ -589,12 +642,16 @@ export function TransactionPage({
           >
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">Cadastro</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">Nova transação</h2>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">{isEditing ? "Edição" : "Cadastro"}</p>
+                <h2 className="mt-2 text-2xl font-semibold text-white">{isEditing ? "Editar transação" : "Nova transação"}</h2>
               </div>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsEditing(false);
+                  setEditingIndex(null);
+                }}
                 className="rounded-full border border-slate-700 p-2 text-slate-300 transition hover:border-slate-500 hover:text-white"
                 aria-label="Fechar modal"
               >
@@ -721,7 +778,11 @@ export function TransactionPage({
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsEditing(false);
+                    setEditingIndex(null);
+                  }}
                   className="rounded-full border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-500 hover:text-white"
                 >
                   Cancelar
@@ -730,7 +791,7 @@ export function TransactionPage({
                   type="submit"
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition ${currentAccent.button}`}
                 >
-                  Salvar transação
+                  {isEditing ? "Salvar alterações" : "Salvar transação"}
                 </button>
               </div>
             </form>
