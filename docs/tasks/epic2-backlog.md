@@ -27,7 +27,7 @@ Alta
 
 | ID | Título | Prioridade | Estimativa | Dependência | Status |
 |---|---|---:|---:|---|---|
-| E2-01 | Definir a arquitetura de telas por módulo de pendência | Alta | M | E1-06 | Planejado |
+| E2-01 | Definir a arquitetura de telas por módulo de pendência | Alta | M | E1-06 | Em andamento |
 | E2-02 | Reaproveitar a base de componente de módulo para contas a pagar e receber | Alta | M | E2-01 | Planejado |
 | E2-03 | Implementar a tela de contas a pagar com dados e métricas | Alta | M | E2-02 | Planejado |
 | E2-04 | Implementar a tela de contas a receber com dados e métricas | Alta | M | E2-02 | Planejado |
@@ -50,6 +50,10 @@ Definir como as telas de pendências serão estruturadas para manter consistênc
 **Objetivo**
 
 Padronizar a estrutura de visualização de módulos ativos sem perder clareza do contexto financeiro pessoal.
+
+**Refinamento inicial**
+
+A arquitetura foi centralizada em um único registro de configuração por módulo para manter a entidade de transação como base, enquanto o módulo define o contexto visual e as regras de status. A reutilização do componente genérico fica como ponto de entrada comum para pendências de despesa e receita.
 
 **Critérios de aceite**
 

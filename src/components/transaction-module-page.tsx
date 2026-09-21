@@ -14,6 +14,7 @@ import { TransactionPage } from "@/components/transaction-page";
 import { getTransactionsByModule } from "@/data/transactions";
 import {
   formatCurrency,
+  transactionModuleConfig,
   transactionStatusLabels,
   TransactionModule,
   TransactionType,
@@ -37,18 +38,20 @@ export function TransactionModulePage({
   storageKey,
 }: TransactionModulePageProps) {
   const records = getTransactionsByModule(module);
-  const isExpenseModule =
-    module === TransactionModule.CONTAS_A_PAGAR || module === TransactionModule.CONTAS_PAGAS;
+  const moduleConfig = transactionModuleConfig[module];
+  const isExpenseModule = moduleConfig.isExpense;
 
   const total = records.reduce((sum, transaction) => sum + transaction.amount, 0);
   const pending = records
-    .filter((transaction) => transaction.status !== "pago" && transaction.status !== "recebido")
+    .filter(
+      (transaction) =>
+        transaction.status !== moduleConfig.completedStatus &&
+        transaction.status !== (isExpenseModule ? "recebido" : "pago"),
+    )
     .reduce((sum, transaction) => sum + transaction.amount, 0);
 
   const completedTotal = records
-    .filter((transaction) =>
-      isExpenseModule ? transaction.status === "pago" : transaction.status === "recebido",
-    )
+    .filter((transaction) => transaction.status === moduleConfig.completedStatus)
     .reduce((sum, transaction) => sum + transaction.amount, 0);
 
   const metrics: Array<{ label: string; value: string; change: string; icon: LucideIcon }> = [
@@ -83,7 +86,7 @@ export function TransactionModulePage({
     .map(([category, value]) => ({
       label: category,
       value: total > 0 ? Math.min(100, Math.max(10, Math.round((value / total) * 100 || 10))) : 0,
-      color: "bg-cyan-400",
+      color: moduleConfig.accent === "rose" ? "bg-rose-400" : moduleConfig.accent === "emerald" ? "bg-emerald-400" : "bg-cyan-400",
     }));
 
   const transactions = records.map((transaction) => ({
@@ -100,7 +103,7 @@ export function TransactionModulePage({
       eyebrow={eyebrow}
       title={title}
       buttonLabel={buttonLabel}
-      accent={accent}
+      accent={moduleConfig.accent}
       metrics={metrics}
       transactions={transactions}
       summary={summary}

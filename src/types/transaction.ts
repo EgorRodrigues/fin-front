@@ -57,6 +57,46 @@ export const transactionModuleLabels: Record<TransactionModule, string> = {
   [TransactionModule.CONTAS_RECEBIDAS]: "Contas recebidas",
 };
 
+export const transactionModuleConfig: Record<
+  TransactionModule,
+  {
+    label: string;
+    type: TransactionType;
+    accent: "cyan" | "rose" | "emerald";
+    isExpense: boolean;
+    completedStatus: TransactionStatus;
+  }
+> = {
+  [TransactionModule.CONTAS_A_PAGAR]: {
+    label: transactionModuleLabels[TransactionModule.CONTAS_A_PAGAR],
+    type: TransactionType.DESPESA,
+    accent: "rose",
+    isExpense: true,
+    completedStatus: TransactionStatus.PAGO,
+  },
+  [TransactionModule.CONTAS_A_RECEBER]: {
+    label: transactionModuleLabels[TransactionModule.CONTAS_A_RECEBER],
+    type: TransactionType.RECEITA,
+    accent: "emerald",
+    isExpense: false,
+    completedStatus: TransactionStatus.RECEBIDO,
+  },
+  [TransactionModule.CONTAS_PAGAS]: {
+    label: transactionModuleLabels[TransactionModule.CONTAS_PAGAS],
+    type: TransactionType.DESPESA,
+    accent: "rose",
+    isExpense: true,
+    completedStatus: TransactionStatus.PAGO,
+  },
+  [TransactionModule.CONTAS_RECEBIDAS]: {
+    label: transactionModuleLabels[TransactionModule.CONTAS_RECEBIDAS],
+    type: TransactionType.RECEITA,
+    accent: "emerald",
+    isExpense: false,
+    completedStatus: TransactionStatus.RECEBIDO,
+  },
+};
+
 export const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", {
     style: "currency",
