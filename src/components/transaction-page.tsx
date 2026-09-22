@@ -12,6 +12,7 @@ import {
 import {
   TransactionModule,
   getModuleStatusOptions,
+  isCompletedModule,
   transactionStatusLabels,
 } from "@/types/transaction";
 
@@ -82,15 +83,27 @@ const initialForm = {
   notes: "",
 };
 
-const filterStatusOptions = [
-  "Todos",
-  "Pendente",
-  "Vencida",
-  "Atrasada",
-  "Pago",
-  "Recebido",
-  "Registrado",
-];
+const getFilterStatusOptions = (module?: TransactionModule) => {
+  if (!module) {
+    return [
+      "Todos",
+      "Pendente",
+      "Vencida",
+      "Atrasada",
+      "Pago",
+      "Recebido",
+      "Registrado",
+    ];
+  }
+
+  const available = getModuleStatusOptions(module).map((status) => transactionStatusLabels[status]);
+
+  if (isCompletedModule(module)) {
+    return ["Todos", ...available];
+  }
+
+  return ["Todos", ...available, "Registrado"];
+};
 
 const parseTransactionAmount = (amount: string) => {
   if (!amount) {
@@ -181,6 +194,7 @@ export function TransactionPage({
     min: "",
     max: "",
   });
+  const filterStatusOptions = getFilterStatusOptions(module);
   const [persistedTransactions, setPersistedTransactions] = useState<TransactionItem[]>(() => {
     if (typeof window === "undefined") {
       return transactions;

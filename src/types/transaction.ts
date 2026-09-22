@@ -39,8 +39,19 @@ export const transactionTypeOptions = Object.values(TransactionType) as Transact
 export const transactionStatusOptions = Object.values(TransactionStatus) as TransactionStatus[];
 export const transactionModuleOptions = Object.values(TransactionModule) as TransactionModule[];
 
+export function getCompletedStatusByModule(module: TransactionModule): TransactionStatus {
+  return transactionModuleConfig[module].completedStatus;
+}
+
+export function isCompletedStatusForModule(
+  module: TransactionModule,
+  status: TransactionStatus,
+): boolean {
+  return getCompletedStatusByModule(module) === status;
+}
+
 export function isTransactionCompleted(transaction: Pick<Transaction, "status" | "module">): boolean {
-  return transaction.status === transactionModuleConfig[transaction.module].completedStatus;
+  return isCompletedStatusForModule(transaction.module, transaction.status);
 }
 
 export function getTransactionLiquidityDate(transaction: Pick<Transaction, "settledAt" | "date">): string {
@@ -123,7 +134,17 @@ export const formatCurrency = (value: number) =>
     currency: "BRL",
   }).format(value);
 
+export function isCompletedModule(module: TransactionModule): boolean {
+  return module === TransactionModule.CONTAS_PAGAS || module === TransactionModule.CONTAS_RECEBIDAS;
+}
+
 export const getModuleStatusOptions = (module: TransactionModule) => {
+  if (isCompletedModule(module)) {
+    return module === TransactionModule.CONTAS_PAGAS
+      ? [TransactionStatus.PAGO]
+      : [TransactionStatus.RECEBIDO];
+  }
+
   const isExpenseModule = module === TransactionModule.CONTAS_A_PAGAR || module === TransactionModule.CONTAS_PAGAS;
 
   return isExpenseModule
