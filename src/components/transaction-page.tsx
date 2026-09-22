@@ -28,6 +28,7 @@ interface TransactionItem {
   category: string;
   amount: string;
   date: string;
+  settledAt?: string;
   status: string;
   account?: string;
   value?: number;
@@ -159,6 +160,22 @@ const getDueStatus = (date: string) => {
     label: `Vence em ${diffInDays} dias`,
     tone: "bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-400/30",
   };
+};
+
+const getHistoryBadge = (transaction: TransactionItem, currentModule?: TransactionModule) => {
+  const isHistorical = currentModule ? isCompletedModule(currentModule) : ["Pago", "Recebido"].includes(transaction.status);
+
+  if (isHistorical) {
+    const settledAt = transaction.settledAt ?? transaction.date;
+    const label = currentModule === TransactionModule.CONTAS_PAGAS ? "Pago em" : "Recebido em";
+
+    return {
+      label: `${label} ${settledAt}`,
+      tone: "bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-400/30",
+    };
+  }
+
+  return getDueStatus(transaction.date);
 };
 
 export function TransactionPage({
@@ -538,10 +555,10 @@ export function TransactionPage({
                       </p>
                       <div className="mt-1 flex flex-col items-end gap-1.5">
                         <span className="inline-flex rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-300">
-                          {transaction.date}
+                          {transaction.settledAt ?? transaction.date}
                         </span>
-                        <span className={`inline-flex rounded-full px-2 py-1 text-[10px] font-medium ${getDueStatus(transaction.date).tone}`}>
-                          {getDueStatus(transaction.date).label}
+                        <span className={`inline-flex rounded-full px-2 py-1 text-[10px] font-medium ${getHistoryBadge(transaction, module).tone}`}>
+                          {getHistoryBadge(transaction, module).label}
                         </span>
                       </div>
                     </div>
@@ -653,8 +670,12 @@ export function TransactionPage({
                   </p>
                 </div>
                 <div className="transaction-modal-surface rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
-                  <p className="transaction-modal-muted text-sm text-slate-400">Data</p>
-                  <p className="transaction-modal-title mt-2 text-base font-medium text-white">{selectedTransaction.transaction.date}</p>
+                  <p className="transaction-modal-muted text-sm text-slate-400">
+                    {module && isCompletedModule(module) ? "Data de liquidação" : "Data"}
+                  </p>
+                  <p className="transaction-modal-title mt-2 text-base font-medium text-white">
+                    {selectedTransaction.transaction.settledAt ?? selectedTransaction.transaction.date}
+                  </p>
                 </div>
                 <div className="transaction-modal-surface rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
                   <p className="transaction-modal-muted text-sm text-slate-400">Status</p>

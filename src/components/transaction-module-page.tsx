@@ -97,6 +97,7 @@ export function TransactionModulePage({
     category: transaction.category,
     amount: `${transaction.type === TransactionType.DESPESA ? "-" : "+"}${formatCurrency(transaction.amount)}`,
     date: transaction.date,
+    settledAt: transaction.settledAt ?? transaction.date,
     status: transactionStatusLabels[transaction.status],
     account: transaction.account ?? "Não informada",
   }));
