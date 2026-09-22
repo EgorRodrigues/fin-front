@@ -280,11 +280,16 @@ export function TransactionPage({
   });
 
   const summaryData = filteredTransactions.length > 0 ? buildSummaryFromTransactions(filteredTransactions) : summary;
-  const overdueCount = filteredTransactions.filter((transaction) => getDueStatus(transaction.date).label.startsWith("Em atraso")).length;
-  const dueSoonCount = filteredTransactions.filter((transaction) => {
-    const status = getDueStatus(transaction.date);
-    return status.label.includes("Vence") || status.label === "Vence hoje";
-  }).length;
+  const isHistoricalModule = module ? isCompletedModule(module) : false;
+  const overdueCount = isHistoricalModule
+    ? 0
+    : filteredTransactions.filter((transaction) => getDueStatus(transaction.date).label.startsWith("Em atraso")).length;
+  const dueSoonCount = isHistoricalModule
+    ? 0
+    : filteredTransactions.filter((transaction) => {
+        const status = getDueStatus(transaction.date);
+        return status.label.includes("Vence") || status.label === "Vence hoje";
+      }).length;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -591,12 +596,16 @@ export function TransactionPage({
 
             <div className="mt-4 grid gap-3">
               <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-3">
-                <p className="text-xs uppercase tracking-[0.18em] text-amber-200">Próximo vencimento</p>
-                <p className="mt-2 text-xl font-semibold text-white">{dueSoonCount}</p>
+                <p className="text-xs uppercase tracking-[0.18em] text-amber-200">
+                  {isHistoricalModule ? "Liquidações recentes" : "Próximo vencimento"}
+                </p>
+                <p className="mt-2 text-xl font-semibold text-white">{isHistoricalModule ? filteredTransactions.length : dueSoonCount}</p>
               </div>
               <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-3">
-                <p className="text-xs uppercase tracking-[0.18em] text-rose-200">Em atraso</p>
-                <p className="mt-2 text-xl font-semibold text-white">{overdueCount}</p>
+                <p className="text-xs uppercase tracking-[0.18em] text-rose-200">
+                  {isHistoricalModule ? "Concluídas" : "Em atraso"}
+                </p>
+                <p className="mt-2 text-xl font-semibold text-white">{isHistoricalModule ? filteredTransactions.length : overdueCount}</p>
               </div>
             </div>
 
