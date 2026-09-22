@@ -30,11 +30,31 @@ export interface Transaction {
   module: TransactionModule;
   account?: string;
   notes?: string;
+  settledAt?: string;
+  statusHistory?: TransactionStatus[];
+  originalModule?: TransactionModule;
 }
 
 export const transactionTypeOptions = Object.values(TransactionType) as TransactionType[];
 export const transactionStatusOptions = Object.values(TransactionStatus) as TransactionStatus[];
 export const transactionModuleOptions = Object.values(TransactionModule) as TransactionModule[];
+
+export function isTransactionCompleted(transaction: Pick<Transaction, "status" | "module">): boolean {
+  return transaction.status === transactionModuleConfig[transaction.module].completedStatus;
+}
+
+export function getTransactionLiquidityDate(transaction: Pick<Transaction, "settledAt" | "date">): string {
+  return transaction.settledAt ?? transaction.date;
+}
+
+export function appendStatusHistory(
+  transaction: Pick<Transaction, "statusHistory" | "status">,
+  nextStatus: TransactionStatus,
+): TransactionStatus[] {
+  const history = transaction.statusHistory ?? [transaction.status];
+
+  return [...new Set([...history, nextStatus])];
+}
 
 export const transactionTypeLabels: Record<TransactionType, string> = {
   [TransactionType.DESPESA]: "Despesa",

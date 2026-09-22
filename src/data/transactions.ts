@@ -16,6 +16,9 @@ export const transactionsSeed: Transaction[] = [
     status: TransactionStatus.PAGO,
     module: TransactionModule.CONTAS_PAGAS,
     account: "Conta Corrente",
+    settledAt: "2026-09-05",
+    statusHistory: [TransactionStatus.PENDENTE, TransactionStatus.PAGO],
+    originalModule: TransactionModule.CONTAS_A_PAGAR,
   },
   {
     id: "txn-002",
@@ -27,6 +30,9 @@ export const transactionsSeed: Transaction[] = [
     status: TransactionStatus.RECEBIDO,
     module: TransactionModule.CONTAS_RECEBIDAS,
     account: "Carteira",
+    settledAt: "2026-09-01",
+    statusHistory: [TransactionStatus.PENDENTE, TransactionStatus.RECEBIDO],
+    originalModule: TransactionModule.CONTAS_A_RECEBER,
   },
   {
     id: "txn-003",
@@ -93,6 +99,9 @@ export const transactionsSeed: Transaction[] = [
     status: TransactionStatus.RECEBIDO,
     module: TransactionModule.CONTAS_RECEBIDAS,
     account: "Pix",
+    settledAt: "2026-09-21",
+    statusHistory: [TransactionStatus.PENDENTE, TransactionStatus.RECEBIDO],
+    originalModule: TransactionModule.CONTAS_A_RECEBER,
   },
   {
     id: "txn-009",
@@ -104,6 +113,9 @@ export const transactionsSeed: Transaction[] = [
     status: TransactionStatus.PAGO,
     module: TransactionModule.CONTAS_PAGAS,
     account: "Conta Corrente",
+    settledAt: "2026-09-10",
+    statusHistory: [TransactionStatus.PENDENTE, TransactionStatus.PAGO],
+    originalModule: TransactionModule.CONTAS_A_PAGAR,
   },
   {
     id: "txn-010",

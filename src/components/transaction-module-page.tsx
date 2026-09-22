@@ -14,6 +14,7 @@ import { TransactionPage } from "@/components/transaction-page";
 import { getTransactionsByModule } from "@/data/transactions";
 import {
   formatCurrency,
+  isTransactionCompleted,
   transactionModuleConfig,
   transactionStatusLabels,
   TransactionModule,
@@ -44,15 +45,11 @@ export function TransactionModulePage({
 
   const total = records.reduce((sum, transaction) => sum + transaction.amount, 0);
   const pending = records
-    .filter(
-      (transaction) =>
-        transaction.status !== moduleConfig.completedStatus &&
-        transaction.status !== (isExpenseModule ? "recebido" : "pago"),
-    )
+    .filter((transaction) => !isTransactionCompleted(transaction))
     .reduce((sum, transaction) => sum + transaction.amount, 0);
 
   const completedTotal = records
-    .filter((transaction) => transaction.status === moduleConfig.completedStatus)
+    .filter((transaction) => isTransactionCompleted(transaction))
     .reduce((sum, transaction) => sum + transaction.amount, 0);
 
   const metrics: Array<{ label: string; value: string; change: string; icon: LucideIcon }> = [
