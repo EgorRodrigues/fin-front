@@ -164,6 +164,14 @@ const getDueStatus = (date: string) => {
   };
 };
 
+const getEffectiveTransactionDate = (transaction: TransactionItem, currentModule?: TransactionModule) => {
+  if (currentModule && isCompletedModule(currentModule)) {
+    return transaction.settledAt ?? transaction.date;
+  }
+
+  return transaction.date;
+};
+
 const getHistoryBadge = (transaction: TransactionItem, currentModule?: TransactionModule) => {
   const isHistorical = currentModule ? isCompletedModule(currentModule) : ["Pago", "Recebido"].includes(transaction.status);
 
@@ -263,7 +271,8 @@ export function TransactionPage({
     }
 
     const currentDate = new Date();
-    const transactionDate = new Date(`${transaction.date}T00:00:00`);
+    const effectiveDate = getEffectiveTransactionDate(transaction, module);
+    const transactionDate = new Date(`${effectiveDate}T00:00:00`);
     const dayDifference = (transactionDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24);
 
     switch (filters.period) {
