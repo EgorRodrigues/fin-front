@@ -138,6 +138,7 @@ Alta
 #### DEV-E3-05 — Validar a base do Epic 3 antes de seguir para os próximos incrementos
 
 - Prioridade técnica: P2 (média)
+- Status: Concluído
 - Arquivos principais: todos citados acima
 - Objetivo: confirmar que a arquitetura e o fluxo do histórico já estão estáveis antes de avançar para filtros avançados, exportação e refinamento do histórico.
 - Implementação esperada:
@@ -150,6 +151,7 @@ Alta
   - a base de regras da transação está pronta para receber filtros, exportação e refinamento de histórico
   - a equipe pode seguir para as próximas tarefas do Epic 3 sem retrabalho de arquitetura
 - Dependências: DEV-E3-04
+- Evidência de validação: checagem do editor e do ESLint para os arquivos afetados retornaram sem erros
 
 ---
 

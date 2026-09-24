@@ -11,7 +11,9 @@ import {
 
 import {
   TransactionModule,
+  getCompletedModule,
   getModuleStatusOptions,
+  getSettlementStatusForModule,
   isCompletedModule,
   transactionStatusLabels,
 } from "@/types/transaction";
@@ -320,6 +322,60 @@ export function TransactionPage({
     });
   };
 
+  const writeToHistoryModule = (transaction: TransactionItem) => {
+    if (typeof window === "undefined" || !module || isCompletedModule(module)) {
+      return;
+    }
+
+    const targetModule = getCompletedModule(module);
+    if (!targetModule) {
+      return;
+    }
+
+    const targetStorageKey = `financy:${targetModule}`;
+    const existing = window.localStorage.getItem(targetStorageKey);
+    const parsed = existing ? (JSON.parse(existing) as TransactionItem[]) : [];
+
+    const settledTransaction: TransactionItem = {
+      ...transaction,
+      settledAt: transaction.settledAt ?? transaction.date,
+      status: transaction.status,
+    };
+
+    window.localStorage.setItem(
+      targetStorageKey,
+      JSON.stringify([settledTransaction, ...parsed]),
+    );
+  };
+
+  const settleTransaction = (transaction: TransactionItem, index: number) => {
+    if (!module || isCompletedModule(module)) {
+      return;
+    }
+
+    const settlementStatus = getSettlementStatusForModule(module);
+    if (!settlementStatus) {
+      return;
+    }
+
+    const nextStatus = transactionStatusLabels[settlementStatus];
+    const updatedTransaction: TransactionItem = {
+      ...transaction,
+      status: nextStatus,
+      settledAt: transaction.settledAt ?? transaction.date,
+      date: transaction.date,
+    };
+
+    setPersistedTransactions((previous) =>
+      previous.map((currentTransaction, currentIndex) =>
+        currentIndex === index ? updatedTransaction : currentTransaction,
+      ),
+    );
+
+    writeToHistoryModule(updatedTransaction);
+    setSelectedTransaction(null);
+  };
+
   const openCreateModal = () => {
     setIsEditing(false);
     setEditingIndex(null);
@@ -365,11 +421,15 @@ export function TransactionPage({
       maximumFractionDigits: 2,
     })}`;
 
+    const settlementStatus = module ? getSettlementStatusForModule(module) : null;
+    const isSettled = settlementStatus !== null && formData.status === settlementStatus;
+
     const transactionToSave: TransactionItem = {
       name: formData.name,
       category: formData.category,
       amount: amountLabel,
       date: formData.date,
+      settledAt: isSettled ? formData.date : undefined,
       status: transactionStatusLabels[formData.status as keyof typeof transactionStatusLabels] ?? "Pendente",
       account: formData.account,
       value: normalizedAmount * (isExpense ? -1 : 1),
@@ -379,8 +439,14 @@ export function TransactionPage({
       setPersistedTransactions((previous) =>
         previous.map((transaction, index) => (index === editingIndex ? transactionToSave : transaction)),
       );
+      if (isSettled) {
+        writeToHistoryModule(transactionToSave);
+      }
     } else {
       setPersistedTransactions((previous) => [transactionToSave, ...previous]);
+      if (isSettled) {
+        writeToHistoryModule(transactionToSave);
+      }
       console.log("Nova transação cadastrada:", transactionToSave);
     }
 
@@ -696,6 +762,17 @@ export function TransactionPage({
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
+              {!isCompletedModule(module ?? TransactionModule.CONTAS_A_PAGAR) && (
+                <button
+                  type="button"
+                  onClick={() => settleTransaction(selectedTransaction.transaction, selectedTransaction.index)}
+                  className={`rounded-full border px-4 py-2 text-sm font-medium transition ${currentAccent.button}`}
+                >
+                  {module === TransactionModule.CONTAS_A_PAGAR || module === TransactionModule.CONTAS_PAGAS
+                    ? "Marcar como pago"
+                    : "Marcar como recebido"}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => openEditModal(selectedTransaction.transaction, selectedTransaction.index)}

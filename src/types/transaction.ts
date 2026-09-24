@@ -138,6 +138,30 @@ export function isCompletedModule(module: TransactionModule): boolean {
   return module === TransactionModule.CONTAS_PAGAS || module === TransactionModule.CONTAS_RECEBIDAS;
 }
 
+export function getCompletedModule(module: TransactionModule): TransactionModule | null {
+  switch (module) {
+    case TransactionModule.CONTAS_A_PAGAR:
+      return TransactionModule.CONTAS_PAGAS;
+    case TransactionModule.CONTAS_A_RECEBER:
+      return TransactionModule.CONTAS_RECEBIDAS;
+    default:
+      return null;
+  }
+}
+
+export function getSettlementStatusForModule(module: TransactionModule): TransactionStatus | null {
+  switch (module) {
+    case TransactionModule.CONTAS_A_PAGAR:
+    case TransactionModule.CONTAS_PAGAS:
+      return TransactionStatus.PAGO;
+    case TransactionModule.CONTAS_A_RECEBER:
+    case TransactionModule.CONTAS_RECEBIDAS:
+      return TransactionStatus.RECEBIDO;
+    default:
+      return null;
+  }
+}
+
 export const getModuleStatusOptions = (module: TransactionModule) => {
   if (isCompletedModule(module)) {
     return module === TransactionModule.CONTAS_PAGAS
