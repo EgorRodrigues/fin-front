@@ -246,6 +246,41 @@ export function TransactionPage({
     new Set([...persistedTransactions.map((transaction) => transaction.category), ...transactions.map((transaction) => transaction.category)]),
   ).filter(Boolean);
 
+  const handleExportHistory = () => {
+    const rows = [
+      ["Nome", "Categoria", "Valor", "Data", "Liquidação", "Status", "Conta"],
+      ...filteredTransactions.map((transaction) => [
+        transaction.name,
+        transaction.category,
+        transaction.amount,
+        transaction.date,
+        transaction.settledAt ?? transaction.date,
+        transaction.status,
+        transaction.account ?? "Não informada",
+      ]),
+    ];
+
+    const csv = rows
+      .map((row) =>
+        row
+          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+          .join(","),
+      )
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const fileName = `${module ?? "historico"}-${new Date().toISOString().slice(0, 10)}.csv`;
+
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const handleFilterChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
 
@@ -482,14 +517,25 @@ export function TransactionPage({
             </p>
             <h1 className="mt-2 text-3xl font-semibold text-white">{title}</h1>
           </div>
-          <button
-            type="button"
-            onClick={openCreateModal}
-            className={`inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition ${currentAccent.button}`}
-          >
-            {buttonLabel}
-            <ArrowUpRight className="ml-2 h-4 w-4" />
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            {module && isCompletedModule(module) && (
+              <button
+                type="button"
+                onClick={handleExportHistory}
+                className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:text-white"
+              >
+                Exportar CSV
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className={`inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-medium transition ${currentAccent.button}`}
+            >
+              {buttonLabel}
+              <ArrowUpRight className="ml-2 h-4 w-4" />
+            </button>
+          </div>
         </header>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
